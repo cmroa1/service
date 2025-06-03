@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+/db-core-data
+/db-core2-data

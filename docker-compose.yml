@@ -1,0 +1,114 @@
+services:
+  db_core: 
+    image: postgres:latest
+    container_name: db_core
+    # restart: always
+    ports: 
+     - "5432:5432"
+    volumes: 
+     - ./db-core-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: db_example
+      POSTGRES_ALLOW_EMPTY_PASSWORD: "no"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d db_example"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    profiles:
+      - core
+      # - recruitment
+  db_core2:
+    image: postgres:latest
+    container_name: db_core2
+    # restart: always
+    ports: 
+     - "5433:5432"
+    volumes: 
+     - ./db-core2-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d db_example2"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: db_example2
+      POSTGRES_ALLOW_EMPTY_PASSWORD: "no"
+    profiles:
+      # - core
+      - core2
+    # depends_on:
+    #   - db_user
+
+  server_core:
+    image: 'docker-spring-boot-postgres-example:latest'
+    build:
+      context: .
+    container_name: server_core
+    environment:
+      SPRING_PROFILES_ACTIVE: core
+      SPRING_DATASOURCE_HOST: db_core
+      SPRING_DATASOURCE_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db_core:5432/db_example
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 12345
+      # SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:   
+     - "8080:8080" 
+    depends_on:
+      db_core:
+        condition: service_healthy
+    profiles:
+      - core
+      # - recruitment
+
+  server_core2:
+    image: 'docker-spring-boot-postgres-example2:latest'
+    build:
+      context: .
+    container_name: server_core2
+    environment:
+      SPRING_PROFILES_ACTIVE: core2
+      SPRING_DATASOURCE_HOST: db_core2
+      SPRING_DATASOURCE_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db_core2:5432/db_example2
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 12345
+      # SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    
+    ports:   
+     - "8081:8080" 
+    depends_on:
+      db_core2:
+        condition: service_healthy
+
+    profiles:
+      # - core
+      - core2
+
+#   pgadmin2:
+#     image: dpage/pgadmin4
+#     container_name: pgadmin2
+#     environment:
+#       PGADMIN_DEFAULT_EMAIL: admin@example.com
+#       PGADMIN_DEFAULT_PASSWORD: admin
+#     volumes:
+#       - pgadmin_data:/var/lib/pgadmin2
+#     ports:
+#       - "5050:80"
+#     # depends_on:
+#     #   - db_user
+#     #   - db_recruitment
+#     profiles:
+#       - core
+#       - core2
+# volumes:
+#   pgadmin_data:

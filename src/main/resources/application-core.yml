@@ -1,0 +1,15 @@
+spring:
+  config:
+    activate:
+      on-profile: core
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/db_example
+    username: postgres
+    password: 12345
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
