@@ -19,7 +19,6 @@ services:
       retries: 10
     profiles:
       - core
-      # - recruitment
   db_core2:
     image: postgres:latest
     container_name: db_core2
@@ -39,10 +38,7 @@ services:
       POSTGRES_DB: db_example2
       POSTGRES_ALLOW_EMPTY_PASSWORD: "no"
     profiles:
-      # - core
       - core2
-    # depends_on:
-    #   - db_user
 
   server_core:
     image: 'docker-spring-boot-postgres-example:latest'
@@ -66,7 +62,6 @@ services:
         condition: service_healthy
     profiles:
       - core
-      # - recruitment
 
   server_core2:
     image: 'docker-spring-boot-postgres-example2:latest'
@@ -91,7 +86,6 @@ services:
         condition: service_healthy
 
     profiles:
-      # - core
       - core2
 
 #   pgadmin2:
@@ -105,8 +99,8 @@ services:
 #     ports:
 #       - "5050:80"
 #     # depends_on:
-#     #   - db_user
-#     #   - db_recruitment
+#     #   - db_core
+#     #   - db_core2
 #     profiles:
 #       - core
 #       - core2
